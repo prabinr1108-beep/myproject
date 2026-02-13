@@ -1,74 +1,603 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Reel Replica — Letter Unfold</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hello Kitty Valentine — For You ❤️</title>
+<style>
+  :root{
+    --pink-1: #fff0f6;
+    --pink-2: #ffd6e7;
+    --accent: #ff3b8a;
+    --muted: #6b4b5a;
+    --card-radius: 20px;
+  }
 
-  <!-- Handwriting-like font -->
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  /* simple Hello-Kitty bow SVG as a very small repeating pattern (data URL) */
+  :root {
+    --bow-svg: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'><g fill='%23ffc0da'><path d='M18 6c4.1 0 7.5 3.4 7.5 7.5S22.1 21 18 21s-7.5-3.4-7.5-7.5S13.9 6 18 6z' fill='%23ff9fc6'/><path d='M6 14c0 0 6-2 9 1 0 0-6 3-9 6 0 0-1-4 0-7z' fill='%23ffb6d1' opacity='0.9'/></g></svg>");
+  }
 
-  <link rel="stylesheet" href="styles.css" />
+  html,body{height:100%;margin:0;font-family:"Helvetica Neue","Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+  body{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    transition: background 420ms ease;
+    background-image: radial-gradient(800px 400px at 10% 20%, rgba(255,230,245,0.9), transparent 18%), linear-gradient(180deg,var(--pink-1),var(--pink-2));
+    background-repeat:no-repeat;
+  }
+
+  /* theme per screen: subtle changes in palette while keeping Hello Kitty feel */
+  body[data-theme="home"]{ background-image:
+    radial-gradient(900px 420px at 12% 18%, rgba(255,235,245,0.95), transparent 20%),
+    linear-gradient(180deg,#fff7fb,#ffdff0); }
+  body[data-theme="dare"]{ background-image:
+    radial-gradient(900px 420px at 88% 82%, rgba(255,220,230,0.85), transparent 20%),
+    linear-gradient(180deg,#fff7f8,#ffecef); }
+  body[data-theme="good"]{ background-image:
+    radial-gradient(900px 420px at 82% 18%, rgba(255,225,235,0.9), transparent 20%),
+    linear-gradient(180deg,#fff9fa,#ffeef6); }
+  body[data-theme="valentine"]{ background-image:
+    radial-gradient(900px 420px at 80% 12%, rgba(255,210,230,0.95), transparent 20%),
+    linear-gradient(180deg,#fff0f6,#ffdfe9); }
+  body[data-theme="final"]{ background-image:
+    radial-gradient(1000px 500px at 20% 80%, rgba(255,205,225,0.95), transparent 22%),
+    linear-gradient(180deg,#fff0f6,#ffcde4); }
+
+  /* subtle bow tiled overlay (cute Hello Kitty feel) */
+  .bow-layer{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background-image: var(--bow-svg);
+    background-repeat: repeat;
+    opacity: 0.06;
+    pointer-events:none;
+  }
+
+  /* screens */
+  .screen{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:6; }
+  .screen:not(.active){ display:none; }
+
+  /* card */
+  .card{
+    width:360px;
+    padding:28px;
+    border-radius:var(--card-radius);
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,249,252,0.98));
+    box-shadow: 0 12px 36px rgba(120,60,90,0.14);
+    text-align:center;
+    position:relative;
+    z-index:8;
+  }
+
+  img.hero{
+    width:140px;
+    height:auto;
+    display:block;
+    margin: 0 auto 12px;
+    border-radius:12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    background: white;
+    padding:6px;
+  }
+
+  h1{ color:var(--accent); margin:6px 0; font-size:20px; letter-spacing:0.6px; }
+  p{ color:var(--muted); margin:0 0 6px 0; line-height:1.35; }
+
+  .buttons{ margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  button{
+    padding:10px 16px; border-radius:20px; border:none; cursor:pointer; font-size:14px;
+    transition: transform .12s ease, box-shadow .12s ease;
+    background: #fff; color:#333; box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+  }
+  /* small pop-on-hover */
+  button:hover, button:focus{ transform: translateY(-6px) scale(1.05); box-shadow:0 18px 36px rgba(0,0,0,0.12); }
+
+  .primary{ background:linear-gradient(90deg,#ff6ea5,#ff9ecb); color:white; border:none; }
+  .yes{ background:linear-gradient(90deg,#ffd6e6,#ffe6f3); color:#b02b57; }
+  .no{ background:linear-gradient(90deg,#fff7f8,#fff0f3); color:#6d3744; }
+
+  .opt-a{ background:linear-gradient(90deg,#ffcbe3,#ffdff4); color:#7a1238; }
+  .opt-b{ background:linear-gradient(90deg,#ffe8d8,#ffecf2); color:#80402b; }
+  .opt-c{ background:linear-gradient(90deg,#f6d9ff,#ffe8f8); color:#532a52; }
+  .opt-d{ background:linear-gradient(90deg,#d6fff0,#ecfff7); color:#14604d; }
+
+  /* big full-screen pops container (emoji-only Hello Kitty-ish pops: bows & hearts & cat-face) */
+  #bigPops{ position:fixed; inset:0; pointer-events:none; z-index:4; overflow:visible; }
+
+  .big-pop{
+    position:fixed;
+    bottom:-18vh;
+    will-change: transform, opacity;
+    font-weight:800;
+    text-shadow: 0 14px 28px rgba(0,0,0,0.12);
+    opacity:0;
+    user-select:none;
+    z-index:5;
+  }
+
+  @keyframes riseFade {
+    0% { transform: translateY(0) scale(.78) rotate(0deg); opacity:0; }
+    8% { transform: translateY(-6vh) scale(1.06) rotate(-8deg); opacity:1; }
+    40% { transform: translateY(-34vh) scale(0.98) rotate(6deg); opacity:0.95; }
+    100% { transform: translateY(-130vh) scale(1.02) rotate(42deg); opacity:0; }
+  }
+
+  /* letter overlay */
+  .overlay{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.38); z-index:12; }
+  .email{ width:360px; border-radius:12px; overflow:hidden; background:white; box-shadow:0 30px 60px rgba(0,0,0,.22); }
+  .email-header{ background:#ffd6e7; padding:12px; font-size:13px; color:#7d2338; }
+  .email-body{ padding:18px; font-size:15px; color:#333; min-height:180px; white-space:pre-wrap; line-height:1.45; }
+  .email-footer{ padding:10px; text-align:right; }
+  .close{ float:right; cursor:pointer; font-weight:700; padding:2px 6px; border-radius:6px; background:rgba(0,0,0,0.03); }
+
+  @media (max-width:520px){
+    .card{ width:320px; padding:20px; border-radius:16px; }
+  }
+
+  /* visually hide audio controls if present */
+  audio{ display:none; }
+</style>
 </head>
-<body>
-  <main class="page">
-    <section class="hero">
-      <div class="hero-left">
-        <h1 class="title">Handwritten Letter</h1>
-        <p class="subtitle">Animated letter unfold and handwriting reveal — tuned to match your reel.</p>
+<body data-theme="home">
 
-        <div class="controls">
-          <a class="btn" id="downloadLetter" href="assets/letter.txt" download="letter.txt">Download the letter</a>
-          <button class="btn ghost" id="playSequence">Play animation</button>
-        </div>
+<!-- Hidden audio element for final screen background music.
+     Source: free background music file (example from Pixabay). You may replace with another track.
+     Note: Browsers require a user gesture to start audio; music will start when user navigates to final screen. -->
+<audio id="finalMusic" loop preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_33c3b8f26f.mp3" type="audio/mpeg">
+</audio>
 
-        <div class="note">
-          <small>This page embeds the Instagram reel for attribution — content owned by the Instagram account.</small>
-        </div>
-      </div>
+<div class="bow-layer" aria-hidden="true"></div>
+<div id="bigPops" aria-hidden="true"></div>
 
-      <div class="hero-right">
-        <div class="scene">
-          <div class="phone-frame">
-            <!-- Visual phone/scene area; letter sits on top -->
-            <div class="letter-wrap" id="letterWrap">
-              <div class="paper folded" id="paper">
-                <div class="paper-front"></div>
-                <div class="paper-back"></div>
+<!-- HOME -->
+<div class="screen active" id="home">
+  <div class="card" aria-label="home">
+    <img class="hero" src="https://i.pinimg.com/originals/05/61/c2/0561c29d7a883f6d47e83e80ee0a1b29.gif" alt="curious kitty">
+    <h1>Hey! 🎀❤️</h1>
+    <p>Can I ask you a question? 💕</p>
+    <div class="buttons">
+      <button class="yes" data-next="good">YES</button>
+      <button class="no" data-next="dare">NO</button>
+    </div>
+  </div>
+</div>
 
-                <!-- Handwriting: SVG text masked by animated rect -->
-                <svg class="handwriting" viewBox="0 0 600 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                  <defs>
-                    <mask id="writeMask">
-                      <rect id="maskRect" x="0" y="0" width="0" height="140" fill="#fff"></rect>
-                    </mask>
-                  </defs>
-                  <text x="36" y="80" font-family="Dancing Script, cursive" font-size="64" fill="#0b1220" mask="url(#writeMask)">
-                    Dear reader,
-                  </text>
+<!-- DARE -->
+<div class="screen" id="dare">
+  <div class="card" aria-label="dare">
+    <img class="hero" src="https://i.pinimg.com/originals/c3/74/44/c374443bca49181fcabeff3182073759.gif" alt="Angry Hello Kitty ">
+    <h1>How Dare You! 💔</h1>
+    <p>Okay kidding — come back and let's be cute again 🎀</p>
+    <div class="buttons">
+      <button class="primary" data-next="home">Go Back</button>
+    </div>
+  </div>
+</div>
 
-                  <text x="36" y="120" font-family="Dancing Script, cursive" font-size="26" fill="#0b1220" mask="url(#writeMask)">
-                    This is the letter content revealed.
-                  </text>
-                </svg>
-              </div>
-            </div>
+<!-- GOOD -->
+<div class="screen" id="good">
+  <div class="card" aria-label="good">
+    <img class="hero" src="https://i.pinimg.com/originals/c6/4f/d1/c64fd194dbdaa7ab6e1665893e9e2f6d.gif" alt="Cute Hello Kitty gif">
+    <h1>GOOD MY CUTIEPIE 😽</h1>
+    <p>You make everything sweeter — continue? 💖</p>
+    <div class="buttons">
+      <button class="primary" data-next="valentine">Yes!! 💕</button>
+    </div>
+  </div>
+</div>
 
-            <!-- Instagram embed -->
-            <div class="embed-wrap">
-              <blockquote class="instagram-media"
-                data-instgrm-permalink="https://www.instagram.com/reel/DT2qW6pkZ13/"
-                data-instgrm-version="14"
-                style="background:#FFF; border:0; margin:0; padding:0; width:100%;">
-              </blockquote>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+<!-- VALENTINE -->
+<div class="screen" id="valentine">
+  <div class="card" aria-label="valentine">
+    <img class="hero" src="https://i.pinimg.com/originals/55/12/86/55128613fa5673639d9bec7c342e542d.gif" alt="Hello Kitty Valentine">
+    <h1>Will you be my Valentine? 💘</h1>
+    <div class="buttons" style="flex-direction:column;">
+      <button class="opt-a" data-next="final">A:Yes🎀💖</button>
+      <button class="opt-b" data-next="final">B: A😌</button>
+      <button class="opt-c" data-next="final">C: B😁</button>
+      <button class="opt-d" data-next="final">D: C😎</button>
+    </div>
+    <p>Pick any — each one is a bow and a promise 💞</p>
+  </div>
+</div>
 
-  <script src="script.js"></script>
-  <!-- Instagram embed script is loaded dynamically in script.js -->
+<!-- FINAL -->
+<div class="screen" id="final">
+  <div class="card" aria-label="final">
+    <img class="hero" src="https://i.pinimg.com/originals/d8/17/fb/d817fb4583391600587c4e817460ed84.gif" alt="Hello Kitty with arrow">
+    <p>This is for you 😊🎀</p>
+    <h1>Happy Valentine’s Day 🌹</h1>
+    <div class="buttons">
+      <button class="primary" id="openLetter">A letter for you 💌</button>
+    </div>
+  </div>
+</div>
+
+<!-- LETTER -->
+<div class="overlay" id="overlay" style="display:none;">
+  <div class="email" role="dialog" aria-modal="true">
+    <div class="email-header">
+      From: Me 🎀
+      <span class="close" id="closeLetter">×</span><br>
+      Subject: For You
+    </div>
+    <div class="email-body" id="letterText"></div>
+    <div class="email-footer">
+      <button id="saveLetter">Save this letter 💾</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /************************************************************************
+   * Music behavior:
+   * - finalMusic (audio element): soft looped background for final screen
+   * - letterPad (WebAudio oscillator): soft ambient pad that runs while letter open
+   * - letterChime (WebAudio): a short bell/chime when opening letter
+   *
+   * Implementation notes:
+   * - AudioContext must be resumed by user gesture on some browsers. We resume
+   *   where appropriate (when user navigates or opens the letter).
+   * - finalMusic is faded in/out smoothly.
+   ************************************************************************/
+
+  // Existing big-pop/theme logic left as-is
+  const THEMES = {
+    home: { emojis: ['🎀','💖','💕','😻'], freq: 1200, sizeRange: [56,120], durationRange: [5200,9800] },
+    dare: { emojis: ['💔','🎀','😼'], freq: 2000, sizeRange: [52,96], durationRange: [4200,7600] },
+    good: { emojis: ['😽','🎀','💞'], freq: 1400, sizeRange: [60,110], durationRange: [4800,8600] },
+    valentine: { emojis: ['💘','🎀','💝','💕'], freq: 900, sizeRange: [72,140], durationRange: [5200,10000] },
+    final: { emojis: ['💐','🎀','💖','❤️'], freq: 520, sizeRange: [88,160], durationRange: [6400,12000] }
+  };
+
+  const bigPops = document.getElementById('bigPops');
+  const body = document.body;
+  let spawnId = null;
+  let active = 'home';
+  const maxNodes = 30;
+
+  function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function rndRange(a,b){ return a + Math.random()*(b-a); }
+
+  function createPop(themeName){
+    const theme = THEMES[themeName] || THEMES.home;
+    if(bigPops.children.length > maxNodes){
+      bigPops.removeChild(bigPops.firstChild);
+    }
+    const el = document.createElement('div');
+    el.className = 'big-pop';
+    el.textContent = rnd(theme.emojis);
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const left = Math.random()*(vw*0.86) + vw*0.07;
+    el.style.left = left + 'px';
+    const rot = (Math.random()*50 - 25).toFixed(2) + 'deg';
+    el.style.transform = `translateY(0) rotate(${rot}) scale(.95)`;
+    const size = Math.round(rndRange(theme.sizeRange[0], theme.sizeRange[1]));
+    el.style.fontSize = size + 'px';
+    el.style.color = '#ff2b78';
+    const dur = Math.round(rndRange(theme.durationRange[0], theme.durationRange[1]));
+    const delay = Math.round(Math.random()*300);
+    el.style.animation = `riseFade ${dur}ms cubic-bezier(.18,.85,.32,1) ${delay}ms forwards`;
+    bigPops.appendChild(el);
+    setTimeout(()=> { if(el.parentNode) el.parentNode.removeChild(el); }, dur + delay + 80);
+  }
+
+  function startTheme(name){
+    stopTheme();
+    active = name;
+    createPop(name);
+    const t = THEMES[name] || THEMES.home;
+    spawnId = setInterval(()=>{
+      createPop(name);
+      if(Math.random() < 0.16) createPop(name);
+    }, t.freq);
+  }
+
+  function stopTheme(){
+    if(spawnId){ clearInterval(spawnId); spawnId = null; }
+  }
+
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const next = document.getElementById(id);
+    if(next) next.classList.add('active');
+    const themeMap = { home:'home', dare:'dare', good:'good', valentine:'valentine', final:'final' };
+    const themeName = themeMap[id] || 'home';
+    body.setAttribute('data-theme', themeName);
+    startTheme(themeName);
+
+    // audio: start/stop final music depending on screen
+    if(themeName === 'final') {
+      playFinalMusic();
+    } else {
+      fadeOutFinalMusic();
+    }
+  }
+
+  // wire navigation buttons
+  document.addEventListener('click', (e)=>{
+    const b = e.target.closest('[data-next]');
+    if(b){
+      const next = b.getAttribute('data-next');
+      showScreen(next);
+      // resume AudioContext / play permission on user gesture
+      if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    }
+  });
+
+  // -- Final music (audio element) with fade helpers --
+  const finalMusic = document.getElementById('finalMusic');
+  finalMusic.volume = 0;
+  let finalFadeInterval = null;
+  const FINAL_TARGET_VOLUME = 0.45; // comfortable background level
+
+  function fadeAudioTo(audioEl, to, duration = 1600){
+    if(!audioEl) return;
+    if(finalFadeInterval) { clearInterval(finalFadeInterval); finalFadeInterval = null; }
+    const stepMs = 60;
+    const steps = Math.max(1, Math.round(duration / stepMs));
+    const from = audioEl.volume;
+    let i = 0;
+    finalFadeInterval = setInterval(()=>{
+      i++;
+      const frac = i / steps;
+      audioEl.volume = Math.max(0, Math.min(1, from + (to - from) * frac));
+      if(i >= steps){
+        clearInterval(finalFadeInterval);
+        finalFadeInterval = null;
+        audioEl.volume = Math.max(0, Math.min(1, to));
+        if(audioEl.volume === 0 && !audioEl.paused){
+          audioEl.pause();
+          audioEl.currentTime = 0;
+        }
+      }
+    }, stepMs);
+  }
+
+  function playFinalMusic(){
+    // try to start playback, then fade in
+    try {
+      if(finalMusic.paused){
+        finalMusic.volume = 0;
+        const playPromise = finalMusic.play();
+        if(playPromise && playPromise.then){
+          playPromise.then(()=> fadeAudioTo(finalMusic, FINAL_TARGET_VOLUME, 1400)).catch(()=>{/* user gesture needed */});
+        } else {
+          // fallback
+          fadeAudioTo(finalMusic, FINAL_TARGET_VOLUME, 1400);
+        }
+      } else {
+        fadeAudioTo(finalMusic, FINAL_TARGET_VOLUME, 1400);
+      }
+    } catch(e){
+      // ignore play errors (autoplay policies)
+      console.warn('finalMusic.play failed:', e);
+    }
+  }
+
+  function fadeOutFinalMusic(){
+    if(finalMusic && !finalMusic.paused){
+      fadeAudioTo(finalMusic, 0, 900);
+    }
+  }
+
+  // -- WebAudio for letter chime + soft pad while overlay open --
+  let audioCtx = null;
+  let letterPadNodes = null;
+
+  function ensureAudioCtx(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+
+  // Soft pad: two detuned sine oscillators through a lowpass and gentle gain envelope
+  function startLetterPad(){
+    const ctx = ensureAudioCtx();
+    if(ctx.state === 'suspended') ctx.resume().catch(()=>{});
+    // if already running, do nothing
+    if(letterPadNodes) return;
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = 0.0; // start silent
+    masterGain.connect(ctx.destination);
+
+    // subtle tremolo (LFO)
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.25; // slow wobble
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 0.25;
+    lfo.connect(lfoGain);
+
+    // two detuned oscillators
+    const oscA = ctx.createOscillator();
+    oscA.type = 'sine';
+    oscA.frequency.value = 220; // A3
+    const oscB = ctx.createOscillator();
+    oscB.type = 'sine';
+    oscB.frequency.value = 277; // ~C#4 for a sweet interval
+
+    // gentle filter to warm the tone
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 900;
+
+    // small gain nodes for each oscillator
+    const gA = ctx.createGain(); gA.gain.value = 0.0;
+    const gB = ctx.createGain(); gB.gain.value = 0.0;
+
+    // connect nodes: osc -> gain -> filter -> masterGain -> dest
+    oscA.connect(gA); gA.connect(filter);
+    oscB.connect(gB); gB.connect(filter);
+    filter.connect(masterGain);
+
+    // LFO modulates masterGain for slight movement
+    lfoGain.connect(masterGain.gain);
+
+    // start oscillators
+    const now = ctx.currentTime;
+    oscA.start(now);
+    oscB.start(now);
+    lfo.start(now);
+
+    // fade in
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.setValueAtTime(0.0, now);
+    masterGain.gain.linearRampToValueAtTime(0.035, now + 1.4); // comfortable background volume
+
+    // gentle individual gains (detune for richness)
+    gA.gain.setValueAtTime(0.016, now + 0.5);
+    gB.gain.setValueAtTime(0.012, now + 0.5);
+
+    letterPadNodes = { ctx, oscA, oscB, lfo, lfoGain, gA, gB, filter, masterGain };
+  }
+
+  function stopLetterPad(){
+    if(!letterPadNodes) return;
+    const { ctx, oscA, oscB, lfo, masterGain } = letterPadNodes;
+    const now = ctx.currentTime;
+    // fade out quickly
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+    masterGain.gain.linearRampToValueAtTime(0.0, now + 0.8);
+
+    // stop nodes after fade
+    setTimeout(()=>{
+      try { oscA.stop(); } catch(e){}
+      try { oscB.stop(); } catch(e){}
+      try { lfo.stop(); } catch(e){}
+    }, 900);
+
+    letterPadNodes = null;
+  }
+
+  // small bell/chime using WebAudio (one-shot)
+  function playLetterChime(){
+    const ctx = ensureAudioCtx();
+    if(ctx.state === 'suspended') ctx.resume().catch(()=>{});
+    const now = ctx.currentTime;
+    // create a bell by FM-ish simple approach
+    const carrier = ctx.createOscillator();
+    carrier.type = 'sine';
+    carrier.frequency.value = 880; // A5
+
+    const mod = ctx.createOscillator();
+    mod.frequency.value = 8.0; // slow FM-ish wobble
+    const modGain = ctx.createGain();
+    modGain.gain.value = 40;
+
+    mod.connect(modGain);
+    modGain.connect(carrier.frequency);
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0.0;
+
+    // gentle highpass to remove rumble and lowpass to warm it
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 220;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3000;
+
+    carrier.connect(gain);
+    gain.connect(hp);
+    hp.connect(lp);
+    lp.connect(ctx.destination);
+
+    // envelope
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+
+    carrier.start(now);
+    mod.start(now);
+    // stop after 2s
+    setTimeout(()=> {
+      try { carrier.stop(); } catch(e){}
+      try { mod.stop(); } catch(e){}
+    }, 1800);
+  }
+
+  // open/close letter behaviour: play chime, start pad, duck/restore final music
+  const openLetterBtn = document.getElementById('openLetter');
+  const overlay = document.getElementById('overlay');
+  const closeLetter = document.getElementById('closeLetter');
+  const letterText = document.getElementById('letterText');
+  const saveBtn = document.getElementById('saveLetter');
+
+  const letter = `My sweetest,
+
+You're my favorite hello and my forever ribbon.
+Thank you for being the pink in my days.
+
+Always yours, 🎀`;
+
+  function typeWriter(text, el, speed=26){
+    el.textContent = '';
+    let i=0;
+    const t = setInterval(()=>{
+      el.textContent += text.charAt(i);
+      i++;
+      if(i>=text.length) clearInterval(t);
+    }, speed);
+  }
+
+  openLetterBtn?.addEventListener('click', async () => {
+    // resume audio context if needed
+    if(audioCtx && audioCtx.state === 'suspended') await audioCtx.resume().catch(()=>{});
+    // sound: play short chime and start pad
+    playLetterChime();
+    startLetterPad();
+
+    // duck final music if playing
+    fadeAudioTo(finalMusic, 0.12, 700);
+
+    overlay.style.display = 'flex';
+    typeWriter(letter, letterText, 26);
+  });
+
+  closeLetter?.addEventListener('click', () => {
+    overlay.style.display = 'none';
+    // stop pad
+    stopLetterPad();
+    // restore final music if we are still in final screen
+    if(body.getAttribute('data-theme') === 'final'){
+      fadeAudioTo(finalMusic, FINAL_TARGET_VOLUME, 900);
+    } else {
+      fadeOutFinalMusic();
+    }
+  });
+
+  saveBtn?.addEventListener('click', ()=>{
+    const blob = new Blob([letter], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'letter-for-you.txt';
+    a.click();
+  });
+
+  // Start theme/pop loops on load
+  window.addEventListener('load', ()=> {
+    startTheme('home');
+
+    // create audioCtx on first user gesture so that we can use WebAudio reliably
+    // (we delay creating it until needed to avoid autoplay restrictions)
+    document.body.addEventListener('pointerdown', function firstTouch(){
+      if(!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      document.body.removeEventListener('pointerdown', firstTouch);
+    }, { once:true });
+  });
+
+  // pause audio and pops when hidden
+  document.addEventListener('visibilitychange', ()=> {
+    if(document.hidden){ stopTheme(); fadeOutFinalMusic(); stopLetterPad(); }
+    else { startTheme(active); if(body.getAttribute('data-theme') === 'final') playFinalMusic(); }
+  });
+</script>
 </body>
 </html>
