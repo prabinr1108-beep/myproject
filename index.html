@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reel Replica — Letter Unfold</title>
+
+  <!-- Handwriting-like font -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-left">
+        <h1 class="title">Handwritten Letter</h1>
+        <p class="subtitle">Animated letter unfold and handwriting reveal — tuned to match your reel.</p>
+
+        <div class="controls">
+          <a class="btn" id="downloadLetter" href="assets/letter.txt" download="letter.txt">Download the letter</a>
+          <button class="btn ghost" id="playSequence">Play animation</button>
+        </div>
+
+        <div class="note">
+          <small>This page embeds the Instagram reel for attribution — content owned by the Instagram account.</small>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="scene">
+          <div class="phone-frame">
+            <!-- Visual phone/scene area; letter sits on top -->
+            <div class="letter-wrap" id="letterWrap">
+              <div class="paper folded" id="paper">
+                <div class="paper-front"></div>
+                <div class="paper-back"></div>
+
+                <!-- Handwriting: SVG text masked by animated rect -->
+                <svg class="handwriting" viewBox="0 0 600 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <defs>
+                    <mask id="writeMask">
+                      <rect id="maskRect" x="0" y="0" width="0" height="140" fill="#fff"></rect>
+                    </mask>
+                  </defs>
+                  <text x="36" y="80" font-family="Dancing Script, cursive" font-size="64" fill="#0b1220" mask="url(#writeMask)">
+                    Dear reader,
+                  </text>
+
+                  <text x="36" y="120" font-family="Dancing Script, cursive" font-size="26" fill="#0b1220" mask="url(#writeMask)">
+                    This is the letter content revealed.
+                  </text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Instagram embed -->
+            <div class="embed-wrap">
+              <blockquote class="instagram-media"
+                data-instgrm-permalink="https://www.instagram.com/reel/DT2qW6pkZ13/"
+                data-instgrm-version="14"
+                style="background:#FFF; border:0; margin:0; padding:0; width:100%;">
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <!-- Instagram embed script is loaded dynamically in script.js -->
+</body>
+</html>

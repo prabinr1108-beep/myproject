@@ -1,0 +1,104 @@
+:root{
+  /* timing variables you can change to match the reel precisely */
+  --unfold-duration: 900ms;        /* paper unfold */
+  --write-duration: 1200ms;        /* handwriting reveal */
+  --pause-after-write: 400ms;      /* short pause before zoom */
+  --zoom-duration: 700ms;          /* scene zoom */
+
+  --bg: #0f1724;
+  --muted: #94a3b8;
+  --accent: #f97316;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:var(--font-sans);
+  background: linear-gradient(180deg,#071022 0%, #0f1724 100%);
+  color:#e6eef8;
+  padding:36px 18px;
+}
+
+/* Page layout */
+.page{max-width:1100px;margin:0 auto}
+.hero{display:grid;grid-template-columns:1fr 420px;gap:36px;align-items:center;min-height:calc(100vh - 72px)}
+
+/* Left side */
+.title{font-size:clamp(26px,4vw,40px);margin:0 0 10px}
+.subtitle{color:var(--muted);margin:0 0 16px}
+
+/* Controls */
+.controls{display:flex;gap:12px}
+.btn{padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#ffb86b);color:#061223;text-decoration:none;font-weight:600;border:0;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.06)}
+
+/* Scene / phone frame */
+.scene{display:flex;justify-content:center}
+.phone-frame{
+  width:100%;
+  max-width:420px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 12px 40px rgba(2,6,23,0.6);
+  position:relative;
+  overflow:hidden;
+  transform-origin:center center;
+  transition: transform var(--zoom-duration) cubic-bezier(.2,.9,.2,1);
+}
+
+/* when zoomed class applied */
+.phone-frame.zoomed{transform:scale(1.06);}
+
+/* Layout inside phone */
+.embed-wrap{width:100%;border-radius:12px;overflow:hidden; background:#fff; min-height:420px}
+.embed-wrap blockquote.instagram-media{width:100% !important; min-height:420px}
+
+/* Letter wrap positioned above embed */
+.letter-wrap{position:absolute;left:50%;top:18%;transform:translateX(-50%);width:80%;max-width:320px;pointer-events:none}
+.paper{
+  width:100%;
+  aspect-ratio:1 / 0.65; /* landscape small card */
+  position:relative;
+  transform-style:preserve-3d;
+  transform-origin:top center;
+}
+
+/* Paper faces */
+.paper-front,
+.paper-back{
+  position:absolute;inset:0;border-radius:8px;background:#fff;border:1px solid rgba(2,6,23,0.05);box-shadow:0 8px 20px rgba(2,6,23,0.18);
+}
+
+/* initial folded state */
+.paper.folded{
+  transform: rotateX(18deg) scaleY(0.96) translateY(6px);
+  transition: transform var(--unfold-duration) cubic-bezier(.2,.9,.2,1);
+  transform-origin: top center;
+}
+
+/* unfolded state class toggled by JS */
+.paper.unfolded{
+  transform: rotateX(0deg) scaleY(1) translateY(0);
+}
+
+/* subtle front/back shading when folded */
+.paper.folded .paper-front{box-shadow: inset 0 -36px 60px rgba(2,6,23,0.06)}
+.paper.unfolded .paper-front{box-shadow:0 8px 20px rgba(2,6,23,0.12)}
+
+/* Handwriting SVG sits within the paper */
+.handwriting{position:absolute;left:0;top:8%;width:100%;height:84%;padding:18px}
+
+/* mask rect animates width to reveal handwriting.
+   We animate it via JS (so we can sequence precisely) but provide a CSS fallback
+*/
+#maskRect{transition: width var(--write-duration) linear}
+
+/* small responsive adjustments */
+@media(max-width:880px){
+  .hero{grid-template-columns:1fr;gap:20px}
+  .phone-frame{max-width:320px}
+  .letter-wrap{top:6%}
+}
